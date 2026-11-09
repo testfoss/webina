@@ -47,3 +47,9 @@ The check does not establish docking accuracy, determinism across native Vina
 versions, mobile support, or non-Chromium compatibility. It saves no output
 PDBQT. `dist/`, `webina.zip`, dependencies, Wasm builds, and browser output are
 ephemeral and excluded from the additive change.
+
+## Remote verification
+
+GitHub Actions run 42651538978 passed the unmodified archived UI build, byte
+comparison of the checked-in Vina engine, and real stock-example docking through
+lmwebtest.
