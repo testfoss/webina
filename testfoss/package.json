@@ -1,0 +1,13 @@
+{
+  "name": "testfoss-webina",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Additive archived-UI browser checks for the Testfoss Webina fork",
+  "scripts": {
+    "browsers:install": "playwright install chromium",
+    "test:browser": "lmscript browser.lms"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

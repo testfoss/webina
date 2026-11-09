@@ -322,3 +322,18 @@ should prevent reporting. Even when using the publicly available version of
 Webina hosted at [http://durrantlab.com/webina](http://durrantlab.com/webina),
 information about your specific receptor and ligand files is never transmitted
 to any remote server.
+
+## Testfoss archived demonstration fork ##
+
+The `testfoss-demo` branch adds an isolated browser scenario without modifying
+the archived UI or its build scripts. It builds the stock interface around the
+repository's checked-in prebuilt Vina 1.2.3 WebAssembly and runs the stock
+1xdn/ATP example through `lmwebtest playwright`. See
+[testfoss/README.md](testfoss/README.md) for commands, the Linux `say` shim, and
+test limits; [AGENTS.md](AGENTS.md) records exact tool and upstream pins.
+
+`LICENSE.md` remains Apache-2.0. The independent ISC declaration in upstream
+`package.json` is a documented metadata discrepancy; this fork intentionally
+changes neither file. Generated `dist/`, archives, dependencies, and docking
+PDBQT output are not checked in. The workflow has read-only repository access,
+no secrets, and no deployment step.

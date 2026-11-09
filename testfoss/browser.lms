@@ -1,0 +1,63 @@
+# Run after the unmodified upstream build and with testfoss/server.py serving the repository.
+let base_url = env("TESTFOSS_URL", "http://127.0.0.1:8000");
+
+program = _lmcode_ cli="lmwebtest playwright";
+let launch_options = "{}";
+if (pw.env("TESTFOSS_CHROMIUM") != "") {
+  launch_options = "{\"executablePath\":\"" + pw.env("TESTFOSS_CHROMIUM") + "\"}";
+}
+let b = pw.launch("chromium", launch_options);
+let p = b.new_page();
+p.set_default_timeout(180000);
+p.goto(pw.env("TESTFOSS_URL") + "/dist/index.html");
+p.get_by_role("button", "{\"name\":\"Use Example Files\",\"exact\":true}").click();
+p.locator("#center_x").expect("toHaveValue", "[\"41.03\"]");
+p.locator("#center_y").expect("toHaveValue", "[\"18.98\"]");
+p.locator("#center_z").expect("toHaveValue", "[\"14.03\"]");
+p.fill("#cpu", "1");
+p.fill("#exhaustiveness", "1");
+p.get_by_role("button", "{\"name\":\"Output Parameters (Optional)\",\"exact\":true}").click();
+p.get_by_role("button", "{\"name\":\"Misc Parameters (Optional)\",\"exact\":true}").click();
+p.fill("#seed", "1");
+p.fill("#num_modes", "1");
+p.get_by_role("button", "{\"name\":\"Start Webina\",\"exact\":true}").click();
+
+p.wait_for_timeout(60000);
+$return.outputPdbqt = p.evaluate("document.querySelectorAll('textarea')[1].value");
+$return.stdout = p.evaluate("document.querySelectorAll('textarea')[0].value");
+$return.resultRows = p.locator("table tbody tr").count();
+$return.outputVisible = p.get_by_role("button", "{\"name\":\"Download\",\"exact\":true}").count();
+$return.pageErrors = p.page_errors();
+$return.console = p.console_log();
+b.close();
+end _lmcode_
+
+let res = run_lmcode(program, {command: ["lmwebtest", "playwright", "--lmcode", "$DSLFILE"]});
+let stats = {pass: 0, fail: 0};
+fn check(condition, name, detail) {
+  if (condition) {
+    stats["pass"] = stats.get("pass", 0) + 1;
+    println(f"[PASS] {name}: {detail}");
+  } else {
+    stats["fail"] = stats.get("fail", 0) + 1;
+    println(f"[FAIL] {name}: {detail}");
+  }
+}
+check(res.get("ok", false), "lmcode run", "stock Webina docking program completed");
+if (!res.get("ok", false)) {
+  println(json_stringify(res));
+  exit(1);
+}
+let r = res.get("result", {});
+let output = r.get("outputPdbqt", "");
+let stdout = r.get("stdout", "");
+check(contains(output, "MODEL"), "stock docking output", "generated PDBQT contains a pose model");
+check(contains(output, "ATOM") || contains(output, "HETATM"), "docked ligand atoms", "generated pose contains atom records");
+check(contains(stdout, "kcal/mol"), "Vina standard output", "affinity table is present");
+check(r.get("resultRows", 0) >= 1, "stock results table", str(r.get("resultRows", 0)));
+check(r.get("outputVisible", 0) >= 1, "archived output controls", "download controls rendered");
+check(r.get("pageErrors", "") == "[]", "browser page errors", r.get("pageErrors", ""));
+println(f"Webina browser integration: {stats.pass} passed, {stats.fail} failed");
+if (stats.fail > 0) {
+  exit(1);
+}
