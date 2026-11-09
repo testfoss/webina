@@ -31,7 +31,7 @@ the archived UI's stock example. It uses CPU 1, exhaustiveness 1, seed 1, and
 one mode to keep CI practical while still executing Vina. It asserts a generated
 PDBQT model and atom records, a Vina affinity table, and output controls.
 
-Tool pins: lmctl 0.2.426, Playwright 1.63.0, lmwebtest v0.1.10 at commit
+Tool pins: lmctl 0.2.469, Playwright 1.63.0, lmwebtest v0.1.10 at commit
 `2920befd355eacc654697820d690db074e94dce3` (Linux x64 SHA-256
 `b90cb79fc2b00627da226e563f77a395fedcb95aca01b076af8ff14755009690`).
 The exact setup and server lifecycle commands are in `AGENTS.md` and
